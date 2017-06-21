@@ -159,7 +159,14 @@ static FILE *OpenOutputFile(const char *output_path, const int force) {
       exit(1);
     }
   }
-  return fopen(output_path, "wb");
+  int fd = open(output_path, O_CREAT | O_WRONLY | O_TRUNC
+#ifdef _MSC_VER
+	  | O_BINARY, S_IWRITE
+#else
+	  , S_IRUSR | S_IWUSR
+#endif
+	  );
+	return fdopen(fd, "wb");
 }
 
 int64_t FileSize(char *path) {
